@@ -13,16 +13,11 @@ public class DropArray {
     public int DropCount;
     private Array<Rectangle> rectDrops;
     private Array<DropSimple> typeDrops;
-    private long dropSpeed;
-    private long previousDropSpeed;
-    private long changeSpeedTime;
-    private long timeDoubleSpeed;
+
 
     public DropArray(){
         typeDrops = new Array<DropSimple>();
         rectDrops = new Array<Rectangle>();
-        dropSpeed = 1000000000;
-        changeSpeedTime = TimeUtils.nanoTime();
     }
 
     public int size(){
@@ -44,38 +39,6 @@ public class DropArray {
 
     public void setY(int ind, float y){
         rectDrops.get(ind).setY(y);
-    }
-
-    public long getDropSpeed(){
-        return dropSpeed;
-    }
-
-    public long getPreviousDropSpeed(){
-        return previousDropSpeed;
-    }
-
-    public long getChangeSpeedTime() {
-        return changeSpeedTime;
-    }
-
-    public long getTimeDoubleSpeed() {
-        return timeDoubleSpeed;
-    }
-
-    public void setTimeDoubleSpeed(long time) {
-        timeDoubleSpeed = time;
-    }
-
-    public void setDropSpeed(long speed){
-        dropSpeed = speed;
-    }
-
-    public void setChangeSpeedTime(long time){
-        changeSpeedTime = time;
-    }
-
-    public void setPreviousDropSpeed(long speed){
-        previousDropSpeed = speed;
     }
 
     public void remove(int ind){

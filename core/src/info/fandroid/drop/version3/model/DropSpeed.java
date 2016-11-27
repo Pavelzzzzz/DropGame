@@ -14,7 +14,6 @@ public class DropSpeed extends DropSimple {
 
     @Override
     public void action(){
-        dropsAction.setDoubleSpeed(true);
-        dropsAction.setDoubleSpeedAdd(true);
+        dropsAction.speedAdd();
     }
 }

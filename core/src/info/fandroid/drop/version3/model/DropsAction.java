@@ -1,40 +1,23 @@
 package info.fandroid.drop.version3.model;
 
+import info.fandroid.drop.version3.DropDeclining;
+
 /**
  * Created by Pavel on 27.11.16.
  */
 
 public class DropsAction {
 
-    DropArray dropArray;
+    DropDeclining dropDeclining;
     Basket basket;
-    boolean doubleSpeed;
-    boolean doubleSpeedAdd;
 
-    public DropsAction(DropArray inputDropArray, Basket inputbasket){
-        dropArray = inputDropArray;
-        doubleSpeed = false;
+    public DropsAction(Basket inputbasket, DropDeclining inoutDropDeclining){
         basket = inputbasket;
+        dropDeclining = inoutDropDeclining;
     }
 
-    public void setDoubleSpeed(boolean bool){
-        doubleSpeed = bool;
-    }
-
-    public void setDoubleSpeedAdd(boolean bool){
-        doubleSpeedAdd = bool;
-    }
-
-    public DropArray getDropArray(){
-        return dropArray;
-    }
-
-    public boolean getDoubleSpeed(){
-        return doubleSpeed;
-    }
-
-    public boolean getDoubleSpeedAdd(){
-        return doubleSpeedAdd;
+    public void speedAdd(){
+        dropDeclining.setAddDropSpeed();
     }
 
     public void basin(){

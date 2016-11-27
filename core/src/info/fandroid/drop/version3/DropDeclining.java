@@ -2,32 +2,45 @@ package info.fandroid.drop.version3;
 
 import com.badlogic.gdx.utils.TimeUtils;
 
-import info.fandroid.drop.version3.model.DropArray;
-import info.fandroid.drop.version3.model.DropsAction;
-
 /**
  * Created by Pavel on 27.11.16.
  */
 
 public class DropDeclining {
 
-    public static void update (DropsAction dropsAction){
+    private int dropSpeed;
+    private long doubleSpeedTime;
+    private long nextDropSpeedTime;
+    private boolean x2;
 
-        if (dropsAction.getDoubleSpeed()){
-            dropsAction.getDropArray().setTimeDoubleSpeed(TimeUtils.nanoTime() + 10000000000L);
-            dropsAction.getDropArray().setPreviousDropSpeed(dropsAction.getDropArray().getDropSpeed());
-            dropsAction.getDropArray().setDropSpeed(dropsAction.getDropArray().getDropSpeed()/4);
-            dropsAction.setDoubleSpeed(false);
+    public DropDeclining(){
+        dropSpeed = 200;
+        x2 = false;
+        nextDropSpeedTime = TimeUtils.nanoTime() + 10000000000L;
+    }
+
+    public void setAddDropSpeed(){
+        doubleSpeedTime = TimeUtils.nanoTime() + 10000000000L;
+    }
+
+    public void update(){
+
+        if ((doubleSpeedTime > TimeUtils.nanoTime()) && !x2){
+            dropSpeed += 100;
+            x2 = true;
+        } else if ((doubleSpeedTime < TimeUtils.nanoTime()) && x2){
+            dropSpeed -= 100;
+            x2 = false;
         }
 
-        if ((dropsAction.getDropArray().getTimeDoubleSpeed() < TimeUtils.nanoTime()) && dropsAction.getDoubleSpeedAdd()){
-            dropsAction.getDropArray().setDropSpeed(dropsAction.getDropArray().getPreviousDropSpeed());
-            dropsAction.setDoubleSpeedAdd(false);
+        if (nextDropSpeedTime  < TimeUtils.nanoTime()){
+            dropSpeed += 10;
+            nextDropSpeedTime = TimeUtils.nanoTime() + 10000000000L;
         }
 
-        if (dropsAction.getDropArray().getChangeSpeedTime() + 1000000000 < TimeUtils.nanoTime()){
-            dropsAction.getDropArray().setDropSpeed(dropsAction.getDropArray().getDropSpeed() - 100000000);
-            dropsAction.getDropArray().setChangeSpeedTime(TimeUtils.nanoTime());
-        }
+    }
+
+    public int getDropSpeed(){
+        return dropSpeed;
     }
 }

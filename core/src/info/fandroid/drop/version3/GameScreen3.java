@@ -37,6 +37,7 @@ public class GameScreen3 implements Screen {
     DropsAction dropsAction;
     DropArray dropArray;
     DropCreator creator;
+    DropDeclining dropDeclining;
 
 
     public GameScreen3 (final Drop gam) {
@@ -54,10 +55,15 @@ public class GameScreen3 implements Screen {
         rainMusic.play();
 
         basket = new Basket();
+
         dropArray = new DropArray();
-        dropsAction = new DropsAction(dropArray, basket);
+        dropDeclining = new DropDeclining();
+        dropsAction = new DropsAction(basket, dropDeclining);
+
         creator = new DropCreator(dropsAction);
         creator.createDrop(dropArray);
+
+
     }
 
     @Override
@@ -76,6 +82,8 @@ public class GameScreen3 implements Screen {
         game.batch.begin();
         game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
         game.font.draw(game.batch, "Score: " + dropsScore, 10, 450);
+        //game.font.draw(game.batch, "Size: " + dropArray.size(), 10, 430);
+        game.font.draw(game.batch, "Speed: " + dropDeclining.getDropSpeed(), 10, 410);
         game.batch.draw(basket.getImage(), basket.getRectangleX(), basket.getRectangleY(), basket.rectangleWidth(), basket.rectangleHeight());
         for (int i = 0; i < dropArray.size(); i++){
             game.batch.draw(dropArray.getType(i).getImage(),
@@ -83,8 +91,9 @@ public class GameScreen3 implements Screen {
                     dropArray.getRectangle(i).y);
         }
         game.batch.end();
-
+        dropDeclining.update();
         basket.update();
+
 
         if (Gdx.input.isTouched()){
             touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -110,7 +119,7 @@ public class GameScreen3 implements Screen {
         ArrayList<Integer> delArray = new ArrayList<Integer>();
 
         for (int i = 0; i < dropArray.size(); i++){
-            dropArray.setY(i, (dropArray.getRectangle(i).y - 200 * Gdx.graphics.getDeltaTime()));
+            dropArray.setY(i, (dropArray.getRectangle(i).y - dropDeclining.getDropSpeed() * Gdx.graphics.getDeltaTime()));
             if (dropArray.getRectangle(i).y + 64 < 0){
                 delArray.add(i);
             }

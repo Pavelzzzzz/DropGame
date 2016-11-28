@@ -1,6 +1,8 @@
-package info.fandroid.drop.version3.model;
+package info.fandroid.drop.version3.model.entity;
 
 import com.badlogic.gdx.graphics.Texture;
+
+import info.fandroid.drop.version3.model.DropsAction;
 
 /**
  * Created by Pavel on 26.11.16.

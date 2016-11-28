@@ -2,7 +2,7 @@ package info.fandroid.drop.version3.model;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
+import info.fandroid.drop.version3.model.entity.DropSimple;
 
 /**
  * Created by Pavel on 26.11.16.

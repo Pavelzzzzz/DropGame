@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import info.fandroid.drop.Drop;
+import info.fandroid.drop.MainMenuScreen;
 import info.fandroid.drop.version3.model.DropArray;
 import info.fandroid.drop.version3.model.Basket;
 import info.fandroid.drop.version3.model.DropCreator;
@@ -26,22 +27,24 @@ import info.fandroid.drop.version3.model.DropsAction;
 public class GameScreen3 implements Screen {
 
     final Drop game;
-    OrthographicCamera camera;
-    Sound dropSound;
-    Music rainMusic;
-    Vector3 touchPos;
-    long lastDropTime;
-    int dropsGathered = 0;
-    int dropsScore = 0;
-    Basket basket;
-    DropsAction dropsAction;
-    DropArray dropArray;
-    DropCreator creator;
-    DropDeclining dropDeclining;
-
+    private OrthographicCamera camera;
+    private Sound dropSound;
+    private Music rainMusic;
+    private Vector3 touchPos;
+    private long lastDropTime;
+    private long dropsGathered;
+    private long dropsScore;
+    private int life;
+    private Basket basket;
+    private DropsAction dropsAction;
+    private DropArray dropArray;
+    private DropCreator creator;
+    private DropDeclining dropDeclining;
+    private DropsCreateSpeed dropsCreateSpeed;
 
     public GameScreen3 (final Drop gam) {
         this.game = gam;
+        life = 10;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
@@ -58,12 +61,10 @@ public class GameScreen3 implements Screen {
 
         dropArray = new DropArray();
         dropDeclining = new DropDeclining();
-        dropsAction = new DropsAction(basket, dropDeclining);
+        dropsCreateSpeed = new DropsCreateSpeed();
+        dropsAction = new DropsAction(basket, dropDeclining, dropsCreateSpeed);
 
         creator = new DropCreator(dropsAction);
-        creator.createDrop(dropArray);
-
-
     }
 
     @Override
@@ -82,8 +83,9 @@ public class GameScreen3 implements Screen {
         game.batch.begin();
         game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
         game.font.draw(game.batch, "Score: " + dropsScore, 10, 450);
-        //game.font.draw(game.batch, "Size: " + dropArray.size(), 10, 430);
+        game.font.draw(game.batch, "Create time: " + dropsCreateSpeed.getCreateSpeedTime()/100000, 10, 430);
         game.font.draw(game.batch, "Speed: " + dropDeclining.getDropSpeed(), 10, 410);
+        game.font.draw(game.batch, "Life: " + life, 10, 390);
         game.batch.draw(basket.getImage(), basket.getRectangleX(), basket.getRectangleY(), basket.rectangleWidth(), basket.rectangleHeight());
         for (int i = 0; i < dropArray.size(); i++){
             game.batch.draw(dropArray.getType(i).getImage(),
@@ -93,6 +95,7 @@ public class GameScreen3 implements Screen {
         game.batch.end();
         dropDeclining.update();
         basket.update();
+        dropsCreateSpeed.update();
 
 
         if (Gdx.input.isTouched()){
@@ -111,7 +114,7 @@ public class GameScreen3 implements Screen {
         if (basket.getRectangleX() > 800 - basket.rectangleWidth())
             basket.setRectangleX(800 - basket.rectangleWidth());
 
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000){
+        if (TimeUtils.nanoTime() - lastDropTime > dropsCreateSpeed.getCreateSpeedTime()){
             lastDropTime = TimeUtils.nanoTime();
             creator.createDrop(dropArray);
         }
@@ -121,6 +124,10 @@ public class GameScreen3 implements Screen {
         for (int i = 0; i < dropArray.size(); i++){
             dropArray.setY(i, (dropArray.getRectangle(i).y - dropDeclining.getDropSpeed() * Gdx.graphics.getDeltaTime()));
             if (dropArray.getRectangle(i).y + 64 < 0){
+                if (life-- < 1){
+                    game.setScreen(new MainMenuScreen(game));
+                    dispose();
+                }
                 delArray.add(i);
             }
             if (basket.overlaps(dropArray.getRectangle(i))){

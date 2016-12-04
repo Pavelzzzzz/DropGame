@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import info.fandroid.drop.Button;
+import info.fandroid.drop.ButtonWithTwoPosition;
 import info.fandroid.drop.Drop;
 import info.fandroid.drop.GameOver;
 import info.fandroid.drop.MainMenuScreen;
@@ -29,6 +31,9 @@ public class GameScreen3 implements Screen {
 
     final Drop game;
     private OrthographicCamera camera;
+    private Vector3 touchPoint;
+    boolean stateClick;
+    private ButtonWithTwoPosition buttonPause;
     private Sound dropSound;
     private Music rainMusic;
     private Vector3 touchPos;
@@ -43,6 +48,7 @@ public class GameScreen3 implements Screen {
     private DropDeclining dropDeclining;
     private DropsCreateSpeed dropsCreateSpeed;
     private boolean playDropSound;
+    private boolean pauseOn;
 
     public GameScreen3 (final Drop gam, boolean inputPlayRainMusic, boolean inputPlayDropSound) {
         this.game = gam;
@@ -51,6 +57,10 @@ public class GameScreen3 implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
 
+        touchPoint = new Vector3();
+        stateClick = false;
+        buttonPause = new ButtonWithTwoPosition("button/buttonPauseOn.png", "button/buttonPauseOff.png", 726, 406, 64, 64);
+        pauseOn = false;
         touchPos = new Vector3();
         playDropSound = inputPlayDropSound;
 
@@ -78,6 +88,20 @@ public class GameScreen3 implements Screen {
         //rainMusic.play();
     }
 
+    private boolean handlerForClickingTheButton(){
+        if (Gdx.input.isTouched()){
+            touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(touchPoint);
+            stateClick = true;
+        } else {
+            if (stateClick){
+                stateClick = false;
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void render (float delta) {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -87,72 +111,77 @@ public class GameScreen3 implements Screen {
 
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
-        game.font.draw(game.batch, "Score: " + dropsScore, 10, 450);
-        game.font.draw(game.batch, "Create time: " + dropsCreateSpeed.getCreateSpeedTime()/100000, 10, 430);
-        game.font.draw(game.batch, "Speed: " + dropDeclining.getDropSpeed(), 10, 410);
-        game.font.draw(game.batch, "Life: " + life, 10, 390);
-        //game.font.draw(game.batch, "Touch  " + touchPos.x + "  " + touchPos.y, 10, 370);
-
-        game.batch.draw(basket.getImage(), basket.getRectangleX(), basket.getRectangleY(), basket.rectangleWidth(), basket.rectangleHeight());
         for (int i = 0; i < dropArray.size(); i++){
             game.batch.draw(dropArray.getType(i).getImage(),
                     dropArray.getRectangle(i).x,
                     dropArray.getRectangle(i).y);
         }
-
+        game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
+        game.font.draw(game.batch, "Score: " + dropsScore, 10, 450);
+        game.font.draw(game.batch, "Create time: " + dropsCreateSpeed.getCreateSpeedTime()/100000, 10, 430);
+        game.font.draw(game.batch, "Speed: " + dropDeclining.getDropSpeed(), 10, 410);
+        game.font.draw(game.batch, "Life: " + life, 10, 390);
+        game.batch.draw(basket.getImage(), basket.getRectangleX(), basket.getRectangleY(), basket.rectangleWidth(), basket.rectangleHeight());
+        game.batch.draw(buttonPause.getButtonImage(), buttonPause.getArrayData()[0], buttonPause.getArrayData()[1],
+                buttonPause.getArrayData()[2], buttonPause.getArrayData()[3]);
         game.batch.end();
         dropDeclining.update();
         basket.update();
         dropsCreateSpeed.update();
 
-
-        if (Gdx.input.isTouched()){
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
-            basket.setRectangleX((int) (touchPos.x - basket.rectangleWidth() / 2));
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            basket.setRectangleX(basket.getRectangleX() - (300* Gdx.graphics.getDeltaTime()));
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            basket.setRectangleX(basket.getRectangleX() + (300* Gdx.graphics.getDeltaTime()));
-
-        if (basket.getRectangleX() < 0)
-            basket.setRectangleX(0);
-        if (basket.getRectangleX() > 800 - basket.rectangleWidth())
-            basket.setRectangleX(800 - basket.rectangleWidth());
-
-        if (TimeUtils.nanoTime() - lastDropTime > dropsCreateSpeed.getCreateSpeedTime()){
-            lastDropTime = TimeUtils.nanoTime();
-            creator.createDrop(dropArray);
-        }
-
-        ArrayList<Integer> delArray = new ArrayList<Integer>();
-
-        for (int i = 0; i < dropArray.size(); i++){
-            dropArray.setY(i, (dropArray.getRectangle(i).y - dropDeclining.getDropSpeed() * Gdx.graphics.getDeltaTime()));
-            if (dropArray.getRectangle(i).y + 64 < 0){
-                if (life-- < 1){
-                    this.dispose();
-                    long speed =new Long(dropsCreateSpeed.getCreateSpeedTime()/100000);
-                    game.setScreen(new GameOver(game, new int []{(int)dropsGathered, (int)dropsScore, (int)speed,  dropDeclining.getDropSpeed()}));
-                }
-                delArray.add(i);
-            }
-            if (basket.overlaps(dropArray.getRectangle(i))){
-                dropsGathered++;
-                dropsScore += dropArray.getType(i).getScore();
-                if (playDropSound){
-                    dropSound.play();
-                }
-                dropArray.getType(i).action();
-                delArray.add(i);
+        if (handlerForClickingTheButton()) {
+            if (buttonPause.contains(touchPoint.x, touchPoint.y)) {
+                this.pause();
             }
         }
-        Iterator<Integer> iter = delArray.iterator();
-        while (iter.hasNext()){
-            dropArray.remove(iter.next());
+        if (pauseOn ==false){
+            if (Gdx.input.isTouched()){
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
+                basket.setRectangleX((int) (touchPos.x - basket.rectangleWidth() / 2));
+            }
+
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+                basket.setRectangleX(basket.getRectangleX() - (300* Gdx.graphics.getDeltaTime()));
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+                basket.setRectangleX(basket.getRectangleX() + (300* Gdx.graphics.getDeltaTime()));
+
+            if (basket.getRectangleX() < 0)
+                basket.setRectangleX(0);
+            if (basket.getRectangleX() > 800 - basket.rectangleWidth())
+                basket.setRectangleX(800 - basket.rectangleWidth());
+
+            if (TimeUtils.nanoTime() - lastDropTime > dropsCreateSpeed.getCreateSpeedTime()){
+                lastDropTime = TimeUtils.nanoTime();
+                creator.createDrop(dropArray);
+            }
+
+            ArrayList<Integer> delArray = new ArrayList<Integer>();
+
+            for (int i = 0; i < dropArray.size(); i++){
+                dropArray.setY(i, (dropArray.getRectangle(i).y - dropDeclining.getDropSpeed() * Gdx.graphics.getDeltaTime()));
+                if (dropArray.getRectangle(i).y + 64 < 0){
+                    if (life-- < 1){
+                        this.dispose();
+                        long speed =new Long(dropsCreateSpeed.getCreateSpeedTime()/100000);
+                        game.setScreen(new GameOver(game, new int []{(int)dropsGathered, (int)dropsScore, (int)speed,  dropDeclining.getDropSpeed()}));
+                    }
+                    delArray.add(i);
+                }
+                if (basket.overlaps(dropArray.getRectangle(i))){
+                    dropsGathered++;
+                    dropsScore += dropArray.getType(i).getScore();
+                    if (playDropSound){
+                        dropSound.play();
+                    }
+                    dropArray.getType(i).action();
+                    delArray.add(i);
+                }
+            }
+            Iterator<Integer> iter = delArray.iterator();
+            while (iter.hasNext()){
+                dropArray.remove(iter.next());
+            }
         }
     }
 
@@ -163,7 +192,8 @@ public class GameScreen3 implements Screen {
 
     @Override
     public void pause() {
-
+        pauseOn = !pauseOn;
+        buttonPause.setStatus(!pauseOn);
     }
 
     @Override
@@ -181,6 +211,7 @@ public class GameScreen3 implements Screen {
         dropSound.dispose();
         rainMusic.dispose();
         basket.dispose();
+        buttonPause.dispose();
         creator.dispose();
 
     }

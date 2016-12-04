@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 
-import info.fandroid.drop.menuButton.ButtonPlay;
-import info.fandroid.drop.menuButton.ButtonSound;
-
 /**
  * Created by Pavel on 29.11.16.
  */
@@ -18,11 +15,14 @@ public class MainMenuScreen2 implements Screen {
     final Drop game;
 
     private OrthographicCamera camera;
-    private ButtonPlay buttonPlay;
+    private Button buttonPlay;
+    private Button buttonResults;
+    private Button buttonHelp;
     private Vector3 touchPoint;
     private boolean playRainMusic;
     private boolean playDropSound;
-    private ButtonSound buttonSound;
+    private ButtonWithTwoPosition buttonSound;
+    private ButtonWithTwoPosition buttonMusic;
     boolean stateClick;
 
     public MainMenuScreen2 (final Drop gam){
@@ -30,8 +30,11 @@ public class MainMenuScreen2 implements Screen {
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
-        buttonPlay = new ButtonPlay(240, 350);
-        buttonSound = new ButtonSound(10, 10);
+        buttonPlay = new Button("button/buttonPlay.png", 240, 350, 320, 100);
+        buttonResults = new Button("button/buttonResults.png", 240, 250, 320, 100);
+        buttonHelp = new Button("button/buttonHelp.png", 240, 150, 320, 100);
+        buttonSound = new ButtonWithTwoPosition("button/buttonSoundOn.png", "button/buttonSoundOff.png", 10, 10, 64, 64);
+        buttonMusic = new ButtonWithTwoPosition("button/buttonMusicOn.png", "button/buttonMusicOff.png", 10, 94, 64, 64);
         touchPoint = new Vector3();
         stateClick = false;
         playRainMusic = true;
@@ -54,18 +57,13 @@ public class MainMenuScreen2 implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
         game.font.draw(game.batch, "Welcome to GameScreen!", 100, 150);
-        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
-//        game.font.draw(game.batch, "Touch  " + touchPoint.x + "  " + touchPoint.y, 100, 300);
-//        game.font.draw(game.batch, "Button play  " + buttonPlay.getArrayData()[0] + "  "
-//                + buttonPlay.getArrayData()[1] + "  "
-//                + buttonPlay.getArrayData()[2] + "  "
-//                + buttonPlay.getArrayData()[3] + "  ", 100, 250);
-//        game.font.draw(game.batch, "Button sound  " + buttonSound.getArrayData()[0]  + "  "
-//                + buttonSound.getArrayData()[1]  + "  "
-//                + buttonSound.getArrayData()[2]  + "  "
-//                + buttonSound.getArrayData()[3]  + "  ", 100, 200);
         game.batch.draw(buttonPlay.getButtonImage(), buttonPlay.getArrayData()[0], buttonPlay.getArrayData()[1]);
-        game.batch.draw(buttonSound.getButtonImage(), buttonSound.getArrayData()[0], buttonSound.getArrayData()[1]);
+        game.batch.draw(buttonResults.getButtonImage(), buttonResults.getArrayData()[0], buttonResults.getArrayData()[1]);
+        game.batch.draw(buttonHelp.getButtonImage(), buttonHelp.getArrayData()[0], buttonHelp.getArrayData()[1]);
+        game.batch.draw(buttonSound.getButtonImage(), buttonSound.getArrayData()[0], buttonSound.getArrayData()[1],
+                        buttonSound.getArrayData()[2], buttonSound.getArrayData()[3]);
+        game.batch.draw(buttonMusic.getButtonImage(), buttonMusic.getArrayData()[0], buttonMusic.getArrayData()[1],
+                        buttonMusic.getArrayData()[2], buttonMusic.getArrayData()[3]);
         game.batch.end();
 
         if (handlerForClickingTheButton()) {
@@ -74,9 +72,19 @@ public class MainMenuScreen2 implements Screen {
                 game.setScreen(new info.fandroid.drop.version3.GameScreen3(game, playRainMusic, playDropSound));
             }
 
+            if (buttonResults.contains(touchPoint.x, touchPoint.y)){
+                this.dispose();
+                game.setScreen(new info.fandroid.drop.ResultsScreen(game));
+            }
+
             if (buttonSound.contains(touchPoint.x, touchPoint.y)){
+                playDropSound = !playDropSound;
+                buttonSound.setStatus(playDropSound);
+            }
+
+            if (buttonMusic.contains(touchPoint.x, touchPoint.y)){
                 playRainMusic = !playRainMusic;
-                buttonSound.setSound(playRainMusic);
+                buttonMusic.setStatus(playRainMusic);
             }
         }
     }
@@ -118,6 +126,9 @@ public class MainMenuScreen2 implements Screen {
     @Override
     public void dispose() {
         buttonPlay.dispose();
+        buttonResults.dispose();
+        buttonHelp.dispose();
+        buttonMusic.dispose();
         buttonSound.dispose();
     }
 }

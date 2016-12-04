@@ -1,24 +1,23 @@
-package info.fandroid.drop.menuButton;
+package info.fandroid.drop;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
 /**
- * Created by Pavel on 29.11.16.
+ * Created by Pavel on 04.12.16.
  */
 
-public class ButtonSound {
-
+public class ButtonWithTwoPosition {
     private Texture buttonImageOn;
     private Texture buttonImageOff;
-    private boolean soundOn;
+    private boolean statusOn;
     private Rectangle rectangle;
 
-    public ButtonSound(int x, int y){
-        buttonImageOn = new Texture("button/buttonSoundOn.png");
-        buttonImageOff = new Texture("button/buttonSoundOff.png");
-        soundOn = true;
-        rectangle = new Rectangle(x , y, 32, 32);
+    public ButtonWithTwoPosition(String nameImageOn, String nameImageOff, int x, int y, int width, int height){
+        buttonImageOn = new Texture(nameImageOn);
+        buttonImageOff = new Texture(nameImageOff);
+        statusOn = true;
+        rectangle = new Rectangle(x , y, width, height);
     }
 
     public boolean contains (float x, float y){
@@ -30,15 +29,15 @@ public class ButtonSound {
     }
 
     public Texture getButtonImage(){
-        if (soundOn){
+        if (statusOn){
             return buttonImageOn;
         }else {
             return buttonImageOff;
         }
     }
 
-    public void setSound(boolean bool){
-        soundOn = bool;
+    public void setStatus(boolean bool){
+        statusOn = bool;
     }
 
     public float[] getArrayData(){
@@ -50,3 +49,4 @@ public class ButtonSound {
         buttonImageOn.dispose();
     }
 }
+

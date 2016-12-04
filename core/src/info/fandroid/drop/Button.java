@@ -1,21 +1,19 @@
-package info.fandroid.drop.menuButton;
+package info.fandroid.drop;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
 
 /**
- * Created by Pavel on 29.11.16.
+ * Created by Pavel on 04.12.16.
  */
 
-public class ButtonPlay {
+public class Button {
+    private Texture buttonImage;
+    private Rectangle rectangle;
 
-    Texture buttonImage;
-    Rectangle rectangle;
-
-    public ButtonPlay(int x, int y){
-        buttonImage = new Texture("button/buttonPlay.png");
-        rectangle = new Rectangle(x , y, 320, 100);
+    public Button(String imageName, int x, int y, int width, int height){
+        buttonImage = new Texture(imageName);
+        rectangle = new Rectangle(x , y, width, height);
     }
 
     public Texture getButtonImage(){

@@ -1,0 +1,146 @@
+[1mdiff --git a/android/assets/button/buttonSoundOff.png b/android/assets/button/buttonSoundOff.png[m
+[1mindex c6f6544..faad777 100644[m
+Binary files a/android/assets/button/buttonSoundOff.png and b/android/assets/button/buttonSoundOff.png differ
+[1mdiff --git a/android/assets/button/buttonSoundOn.png b/android/assets/button/buttonSoundOn.png[m
+[1mindex c25dc0a..007dbb0 100644[m
+Binary files a/android/assets/button/buttonSoundOn.png and b/android/assets/button/buttonSoundOn.png differ
+[1mdiff --git a/core/src/info/fandroid/drop/GameOver.java b/core/src/info/fandroid/drop/GameOver.java[m
+[1mindex c147589..d32be18 100644[m
+[1m--- a/core/src/info/fandroid/drop/GameOver.java[m
+[1m+++ b/core/src/info/fandroid/drop/GameOver.java[m
+[36m@@ -5,6 +5,7 @@[m [mimport com.badlogic.gdx.Screen;[m
+ import com.badlogic.gdx.graphics.GL20;[m
+ import com.badlogic.gdx.graphics.OrthographicCamera;[m
+ import com.badlogic.gdx.math.Vector3;[m
+[32m+[m[32mimport com.badlogic.gdx.utils.StringBuilder;[m
+ [m
+ import info.fandroid.drop.menuButton.ButtonPlay;[m
+ [m
+[36m@@ -30,6 +31,17 @@[m [mpublic class GameOver implements Screen {[m
+         resultArray = inputResultArray;[m
+         buttonPlay = new ButtonPlay(240, 350);[m
+         touchPoint = new Vector3();[m
+[32m+[m[32m        Score score = new Score();[m
+[32m+[m[32m        StringBuilder sb = new StringBuilder();[m
+[32m+[m[32m        sb.append("  ");[m
+[32m+[m[32m        sb.append(Integer.toString(inputResultArray[0]));[m
+[32m+[m[32m        sb.append("  ");[m
+[32m+[m[32m        sb.append(Integer.toString(inputResultArray[2]));[m
+[32m+[m[32m        sb.append("  ");[m
+[32m+[m[32m        sb.append(Integer.toString(inputResultArray[3]));[m
+[32m+[m[32m        sb.append('\n');[m
+[32m+[m[32m        score.setScore(new String[]{Integer.toString(inputResultArray[1]), sb.toString()});[m
+[32m+[m[32m        score.writeToFile();[m
+     }[m
+ [m
+ [m
+[1mdiff --git a/core/src/info/fandroid/drop/MainMenuScreen2.java b/core/src/info/fandroid/drop/MainMenuScreen2.java[m
+[1mindex 5cb604b..8c49284 100644[m
+[1m--- a/core/src/info/fandroid/drop/MainMenuScreen2.java[m
+[1m+++ b/core/src/info/fandroid/drop/MainMenuScreen2.java[m
+[36m@@ -6,7 +6,10 @@[m [mimport com.badlogic.gdx.graphics.GL20;[m
+ import com.badlogic.gdx.graphics.OrthographicCamera;[m
+ import com.badlogic.gdx.math.Vector3;[m
+ [m
+[32m+[m[32mimport info.fandroid.drop.menuButton.ButtonHelp;[m
+[32m+[m[32mimport info.fandroid.drop.menuButton.ButtonMusic;[m
+ import info.fandroid.drop.menuButton.ButtonPlay;[m
+[32m+[m[32mimport info.fandroid.drop.menuButton.ButtonResults;[m
+ import info.fandroid.drop.menuButton.ButtonSound;[m
+ [m
+ /**[m
+[36m@@ -19,10 +22,13 @@[m [mpublic class MainMenuScreen2 implements Screen {[m
+ [m
+     private OrthographicCamera camera;[m
+     private ButtonPlay buttonPlay;[m
+[32m+[m[32m    private ButtonResults buttonResults;[m
+[32m+[m[32m    private ButtonHelp buttonHelp;[m
+     private Vector3 touchPoint;[m
+     private boolean playRainMusic;[m
+     private boolean playDropSound;[m
+     private ButtonSound buttonSound;[m
+[32m+[m[32m    private ButtonMusic buttonMusic;[m
+     boolean stateClick;[m
+ [m
+     public MainMenuScreen2 (final Drop gam){[m
+[36m@@ -31,7 +37,10 @@[m [mpublic class MainMenuScreen2 implements Screen {[m
+         camera = new OrthographicCamera();[m
+         camera.setToOrtho(false, 800, 480);[m
+         buttonPlay = new ButtonPlay(240, 350);[m
+[32m+[m[32m        buttonResults = new ButtonResults(240, 250);[m
+[32m+[m[32m        buttonHelp = new ButtonHelp(240, 150);[m
+         buttonSound = new ButtonSound(10, 10);[m
+[32m+[m[32m        buttonMusic = new ButtonMusic(10, 94);[m
+         touchPoint = new Vector3();[m
+         stateClick = false;[m
+         playRainMusic = true;[m
+[36m@@ -54,18 +63,13 @@[m [mpublic class MainMenuScreen2 implements Screen {[m
+         game.batch.setProjectionMatrix(camera.combined);[m
+         game.batch.begin();[m
+         game.font.draw(game.batch, "Welcome to GameScreen!", 100, 150);[m
+[31m-        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);[m
+[31m-//        game.font.draw(game.batch, "Touch  " + touchPoint.x + "  " + touchPoint.y, 100, 300);[m
+[31m-//        game.font.draw(game.batch, "Button play  " + buttonPlay.getArrayData()[0] + "  "[m
+[31m-//                + buttonPlay.getArrayData()[1] + "  "[m
+[31m-//                + buttonPlay.getArrayData()[2] + "  "[m
+[31m-//                + buttonPlay.getArrayData()[3] + "  ", 100, 250);[m
+[31m-//        game.font.draw(game.batch, "Button sound  " + buttonSound.getArrayData()[0]  + "  "[m
+[31m-//                + buttonSound.getArrayData()[1]  + "  "[m
+[31m-//                + buttonSound.getArrayData()[2]  + "  "[m
+[31m-//                + buttonSound.getArrayData()[3]  + "  ", 100, 200);[m
+         game.batch.draw(buttonPlay.getButtonImage(), buttonPlay.getArrayData()[0], buttonPlay.getArrayData()[1]);[m
+[31m-        game.batch.draw(buttonSound.getButtonImage(), buttonSound.getArrayData()[0], buttonSound.getArrayData()[1]);[m
+[32m+[m[32m        game.batch.draw(buttonResults.getButtonImage(), buttonResults.getArrayData()[0], buttonResults.getArrayData()[1]);[m
+[32m+[m[32m        game.batch.draw(buttonHelp.getButtonImage(), buttonHelp.getArrayData()[0], buttonHelp.getArrayData()[1]);[m
+[32m+[m[32m        game.batch.draw(buttonSound.getButtonImage(), buttonSound.getArrayData()[0], buttonSound.getArrayData()[1],[m
+[32m+[m[32m                        buttonSound.getArrayData()[2], buttonSound.getArrayData()[3]);[m
+[32m+[m[32m        game.batch.draw(buttonMusic.getButtonImage(), buttonMusic.getArrayData()[0], buttonMusic.getArrayData()[1],[m
+[32m+[m[32m                        buttonMusic.getArrayData()[2], buttonMusic.getArrayData()[3]);[m
+         game.batch.end();[m
+ [m
+         if (handlerForClickingTheButton()) {[m
+[36m@@ -74,9 +78,19 @@[m [mpublic class MainMenuScreen2 implements Screen {[m
+                 game.setScreen(new info.fandroid.drop.version3.GameScreen3(game, playRainMusic, playDropSound));[m
+             }[m
+ [m
+[32m+[m[32m            if (buttonResults.contains(touchPoint.x, touchPoint.y)){[m
+[32m+[m[32m                this.dispose();[m
+[32m+[m[32m                game.setScreen(new info.fandroid.drop.ResultsScreen(game));[m
+[32m+[m[32m            }[m
+[32m+[m
+             if (buttonSound.contains(touchPoint.x, touchPoint.y)){[m
+[32m+[m[32m                playDropSound = !playDropSound;[m
+[32m+[m[32m                buttonSound.setSound(playDropSound);[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            if (buttonMusic.contains(touchPoint.x, touchPoint.y)){[m
+                 playRainMusic = !playRainMusic;[m
+[31m-                buttonSound.setSound(playRainMusic);[m
+[32m+[m[32m                buttonMusic.setSound(playRainMusic);[m
+             }[m
+         }[m
+     }[m
+[36m@@ -118,6 +132,9 @@[m [mpublic class MainMenuScreen2 implements Screen {[m
+     @Override[m
+     public void dispose() {[m
+         buttonPlay.dispose();[m
+[32m+[m[32m        buttonResults.dispose();[m
+[32m+[m[32m        buttonHelp.dispose();[m
+[32m+[m[32m        buttonMusic.dispose();[m
+         buttonSound.dispose();[m
+     }[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/core/src/info/fandroid/drop/menuButton/ButtonSound.java b/core/src/info/fandroid/drop/menuButton/ButtonSound.java[m
+[1mindex f8fce4c..b1e2e21 100644[m
+[1m--- a/core/src/info/fandroid/drop/menuButton/ButtonSound.java[m
+[1m+++ b/core/src/info/fandroid/drop/menuButton/ButtonSound.java[m
+[36m@@ -18,7 +18,7 @@[m [mpublic class ButtonSound {[m
+         buttonImageOn = new Texture("button/buttonSoundOn.png");[m
+         buttonImageOff = new Texture("button/buttonSoundOff.png");[m
+         soundOn = true;[m
+[31m-        rectangle = new Rectangle(x , y, 32, 32);[m
+[32m+[m[32m        rectangle = new Rectangle(x , y, 64, 64);[m
+     }[m
+ [m
+     public boolean contains (float x, float y){[m
